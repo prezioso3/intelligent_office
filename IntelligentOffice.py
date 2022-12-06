@@ -51,7 +51,17 @@ class IntelligentOffice:
         :param pin: The data pin of the sensor that is being checked (e.g., INFRARED_PIN1).
         :return: True if the infrared sensor detects something, False otherwise.
         """
-        pass
+        check_sensor_value = 0
+
+        if pin not in [self.INFRARED_PIN_1, self.INFRARED_PIN_2, self.INFRARED_PIN_3, self.INFRARED_PIN_4]:
+            raise IntelligentOfficeError
+
+        if check_sensor_value == 0:
+            print('The value is 0')
+            return False
+        else:
+            print('The value is ' + str(check_sensor_value))
+            return True
 
     def manage_blinds_based_on_time(self) -> None:
         """
@@ -59,7 +69,19 @@ class IntelligentOffice:
         The system fully opens the blinds at 8:00 and fully closes them at 20:00
         each day except for Saturday and Sunday.
         """
-        pass
+        current_time = self.rtc.get_current_time_string()
+        current_day = self.rtc.get_current_day()
+
+        current_hour = int(current_time[0] + current_time[1])
+
+        if 8 <= current_hour <= 20 and (current_day != 'SATURDAY' or current_day != 'SUNDAY'):
+            print('Is ' + current_day + ' and the hour is ' + str(current_hour) + ' so the blinds are opened')
+            self.change_servo_angle(12)
+            self.blinds_open = True
+        else:
+            print('Is ' + current_day + ' and the hour is ' + str(current_hour) + ' so the blinds are closed')
+            self.change_servo_angle(2)
+            self.blinds_open = False
 
     def manage_light_level(self) -> None:
         """
@@ -72,7 +94,24 @@ class IntelligentOffice:
         stops regulating the light level in the office and then turns off the smart light bulb. 
         When the first worker goes back into the office, the system resumes regulating the light level
         """
-        pass
+        current_light_level = 400
+        count = 0
+
+        for pin in [self.INFRARED_PIN_1, self.INFRARED_PIN_2, self.INFRARED_PIN_3, self.INFRARED_PIN_4]:
+            if GPIO.input(pin) == 0:
+                count += 1
+
+        if count == 4:
+            GPIO.output(self.LED_PIN, GPIO.LOW)
+            self.light_on = False
+            return
+        else:
+            if current_light_level < self.LUX_MIN:
+                GPIO.output(self.LED_PIN, GPIO.HIGH)
+                self.light_on = True
+            elif current_light_level > self.LUX_MAX:
+                GPIO.output(self.LED_PIN, GPIO.LOW)
+                self.light_on = False
 
     def monitor_air_quality(self) -> None:
         """
@@ -80,7 +119,16 @@ class IntelligentOffice:
         If the amount of detected CO2 is greater than or equal to 800 PPM, the system turns on the
         switch of the exhaust fan until the amount of CO2 is lower than 500 PPM.
         """
-        pass
+        current_air_quality = 450
+
+        if current_air_quality >= 800:
+            print("Active the fan")
+            GPIO.output(self.FAN_PIN, GPIO.IN)
+            self.fan_switch_on = True
+        elif current_air_quality < 500:
+            print("Turn off the fan")
+            GPIO.output(self.FAN_PIN, GPIO.OUT)
+            self.fan_switch_on = False
 
     def change_servo_angle(self, duty_cycle: float) -> None:
         """
