@@ -40,3 +40,19 @@ class IntelligentOfficeTest(unittest.TestCase):
 
     def test_quadrant_occupancy_wrong_pin(self):
         self.assertRaises(IntelligentOfficeError, self.io.check_quadrant_occupancy, 50)
+
+    @patch.object(RTC, 'get_current_day')
+    @patch.object(RTC, 'get_current_time_string')
+    def test_blinds_open(self, mock_time, mock_day):
+        mock_day.return_value = 'MONDAY'
+        mock_time.return_value = "16:28:18"
+        self.io.manage_blinds_based_on_time()
+        self.assertTrue(self.io.blinds_open)
+
+    @patch.object(RTC, 'get_current_day')
+    @patch.object(RTC, 'get_current_time_string')
+    def test_blinds_closed(self, mock_time, mock_day):
+        mock_day.return_value = 'SUNDAY'
+        mock_time.return_value = "12:11:01"
+        self.io.manage_blinds_based_on_time()
+        self.assertFalse(self.io.blinds_open)

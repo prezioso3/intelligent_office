@@ -69,8 +69,8 @@ class IntelligentOffice:
         The system fully opens the blinds at 8:00 and fully closes them at 20:00
         each day except for Saturday and Sunday.
         """
-        current_time = self.rtc.get_current_time_string()
         current_day = self.rtc.get_current_day()
+        current_time = self.rtc.get_current_time_string()
 
         current_hour = int(current_time[0] + current_time[1])
 
