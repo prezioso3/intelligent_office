@@ -51,7 +51,7 @@ class IntelligentOffice:
         :param pin: The data pin of the sensor that is being checked (e.g., INFRARED_PIN1).
         :return: True if the infrared sensor detects something, False otherwise.
         """
-        check_sensor_value = 0
+        check_sensor_value = GPIO.input(pin)
 
         if pin not in [self.INFRARED_PIN_1, self.INFRARED_PIN_2, self.INFRARED_PIN_3, self.INFRARED_PIN_4]:
             raise IntelligentOfficeError
