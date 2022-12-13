@@ -56,3 +56,27 @@ class IntelligentOfficeTest(unittest.TestCase):
         mock_time.return_value = "12:11:01"
         self.io.manage_blinds_based_on_time()
         self.assertFalse(self.io.blinds_open)
+
+    @patch.object(GPIO, 'input')
+    def test_light_level_under_min(self, mock_light_level):
+        mock_light_level.return_value = 480
+        self.io.manage_light_level()
+        self.assertTrue(self.io.light_on)
+
+    @patch.object(GPIO, 'input')
+    def test_light_level_above_max(self, mock_light_level):
+        mock_light_level.return_value = 580
+        self.io.manage_light_level()
+        self.assertFalse(self.io.light_on)
+
+    @patch.object(GPIO, 'input')
+    def test_light_vacant_quadrants(self, mock_sensor_values):
+        mock_sensor_values.side_effect = [0,0,0,0]
+        num_occ = self.io.get_occupied_quadrants()
+        self.assertEqual(0, num_occ)
+
+    @patch.object(GPIO, 'input')
+    def test_light_one_quadrant_occupied(self, mock_sensor_values):
+        mock_sensor_values.side_effect = [1, 0, 0, 0]
+        num_occ = self.io.get_occupied_quadrants()
+        self.assertEqual(1, num_occ)

@@ -94,24 +94,40 @@ class IntelligentOffice:
         stops regulating the light level in the office and then turns off the smart light bulb. 
         When the first worker goes back into the office, the system resumes regulating the light level
         """
-        current_light_level = 400
-        count = 0
+        current_light_level = GPIO.input(self.PHOTO_PIN)
+        print(current_light_level)
 
-        for pin in [self.INFRARED_PIN_1, self.INFRARED_PIN_2, self.INFRARED_PIN_3, self.INFRARED_PIN_4]:
-            if GPIO.input(pin) == 0:
-                count += 1
-
-        if count == 4:
+        # for pin in [self.INFRARED_PIN_1, self.INFRARED_PIN_2, self.INFRARED_PIN_3, self.INFRARED_PIN_4]:
+        #     if GPIO.input(pin) == 0:
+        #         count += 1
+        #
+        # if count == 4:
+        #     GPIO.output(self.LED_PIN, GPIO.LOW)
+        #     self.light_on = False
+        #     return
+        #else:
+        if current_light_level < self.LUX_MIN:
+            GPIO.output(self.LED_PIN, GPIO.HIGH)
+            self.light_on = True
+        elif current_light_level > self.LUX_MAX:
             GPIO.output(self.LED_PIN, GPIO.LOW)
             self.light_on = False
-            return
-        else:
-            if current_light_level < self.LUX_MIN:
-                GPIO.output(self.LED_PIN, GPIO.HIGH)
-                self.light_on = True
-            elif current_light_level > self.LUX_MAX:
-                GPIO.output(self.LED_PIN, GPIO.LOW)
-                self.light_on = False
+
+    def get_occupied_quadrants(self) -> int:
+        """
+        Calculates the number of occupied quadrant in the office.
+        :return: The number of occupied quadrants.
+        """
+        count = 0
+        for pin in [self.INFRARED_PIN_1, self.INFRARED_PIN_2, self.INFRARED_PIN_3, self.INFRARED_PIN_4]:
+            if GPIO.input(pin) > 0:
+                count += 1
+
+        if count == 0:
+            GPIO.output(self.LED_PIN, GPIO.LOW)
+            self.light_on = False
+
+        return count
 
     def monitor_air_quality(self) -> None:
         """
