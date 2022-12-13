@@ -57,10 +57,8 @@ class IntelligentOffice:
             raise IntelligentOfficeError
 
         if check_sensor_value == 0:
-            print('The value is 0')
             return False
         else:
-            print('The value is ' + str(check_sensor_value))
             return True
 
     def manage_blinds_based_on_time(self) -> None:
@@ -75,11 +73,9 @@ class IntelligentOffice:
         current_hour = int(current_time[0] + current_time[1])
 
         if 8 <= current_hour <= 20 and (current_day != 'SATURDAY' and current_day != 'SUNDAY'):
-            print('Is ' + current_day + ' and the hour is ' + str(current_hour) + ' so the blinds are opened')
             self.change_servo_angle(12)
             self.blinds_open = True
         else:
-            print('Is ' + current_day + ' and the hour is ' + str(current_hour) + ' so the blinds are closed')
             self.change_servo_angle(2)
             self.blinds_open = False
 
@@ -95,7 +91,6 @@ class IntelligentOffice:
         When the first worker goes back into the office, the system resumes regulating the light level
         """
         current_light_level = GPIO.input(self.PHOTO_PIN)
-        print(current_light_level)
 
         # for pin in [self.INFRARED_PIN_1, self.INFRARED_PIN_2, self.INFRARED_PIN_3, self.INFRARED_PIN_4]:
         #     if GPIO.input(pin) == 0:
@@ -135,14 +130,12 @@ class IntelligentOffice:
         If the amount of detected CO2 is greater than or equal to 800 PPM, the system turns on the
         switch of the exhaust fan until the amount of CO2 is lower than 500 PPM.
         """
-        current_air_quality = 450
+        current_air_quality = GPIO.input(self.CO2_PIN)
 
         if current_air_quality >= 800:
-            print("Active the fan")
             GPIO.output(self.FAN_PIN, GPIO.IN)
             self.fan_switch_on = True
         elif current_air_quality < 500:
-            print("Turn off the fan")
             GPIO.output(self.FAN_PIN, GPIO.OUT)
             self.fan_switch_on = False
 

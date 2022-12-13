@@ -80,3 +80,15 @@ class IntelligentOfficeTest(unittest.TestCase):
         mock_sensor_values.side_effect = [1, 0, 0, 0]
         num_occ = self.io.get_occupied_quadrants()
         self.assertEqual(1, num_occ)
+
+    @patch.object(GPIO, 'input')
+    def test_air_quality_CO2_under_min(self, mock_carbon_dioxide):
+        mock_carbon_dioxide.return_value = 490
+        self.io.monitor_air_quality()
+        self.assertFalse(self.io.fan_switch_on)
+
+    @patch.object(GPIO, 'input')
+    def test_air_quality_CO2_above_max(self, mock_carbon_dioxide):
+        mock_carbon_dioxide.return_value = 830
+        self.io.monitor_air_quality()
+        self.assertTrue(self.io.fan_switch_on)
