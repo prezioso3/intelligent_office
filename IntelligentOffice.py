@@ -74,7 +74,7 @@ class IntelligentOffice:
 
         current_hour = int(current_time[0] + current_time[1])
 
-        if 8 <= current_hour <= 20 and (current_day != 'SATURDAY' or current_day != 'SUNDAY'):
+        if 8 <= current_hour <= 20 and (current_day != 'SATURDAY' and current_day != 'SUNDAY'):
             print('Is ' + current_day + ' and the hour is ' + str(current_hour) + ' so the blinds are opened')
             self.change_servo_angle(12)
             self.blinds_open = True
